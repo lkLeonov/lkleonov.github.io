@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>JS Design</title>
+
+	
+	
+	<link rel="stylesheet" href="css.highlight/atelier-cave-light.css">
+	<script src="js/highlight.pack.js"></script>
+	<script>hljs.initHighlightingOnLoad();</script>
+	<link rel="stylesheet" href="css/jsdesign.css">
+</head>
+<body>
+	<header>
+		JavaScript Design Patterns
+	</header>
+	<main>
+	<section class="patterns">
+		<article>
+			<header>Factory</header>
+			<section class="code">
+				<pre><code>
+// factory function to create car objects
+function createCar(make, model, year) {
+    var o = new Object();
+
+    o.make   = make;
+    o.model  = model;
+    o.year   = year;
+    o.sayCar = function() {
+        alert('I have a ' + this.year + ' ' 
+			  + this.make + ' ' 
+			  + this.model + '.');
+    };
+
+    return o;
+}
+
+
+// create 2 car objects for John and Jane
+var johnCar = createCar('Ford', 'F150', '2011'),
+    janeCar = createCar('Audi', 'A4', '2007');
+
+// call method on Jane's car
+janeCar.sayCar();
+				</code></pre>
+			</section>
+			<section class="description">
+			JavaScript’s Factory Pattern employs a factory function to create new objects. It was conceived as a DRY means to abstract the process of creating objects. However, there are couple problems with it:
+
+Efficiency — Methods created on the factory function are copied to all new object instances. This is inefficient.
+Type Determination — Because the factory function returns a new object, it makes type determination of object instances difficult. New object instances are typed as “Object”, with no indication of the instances’ context.
+The type determination problem led to the creation of the Constructor Pattern.
+			</section>
+		</article>	
+
+
+
+		<article>
+			<header>Constructor</header>
+			<section>
+				<pre><code>
+// constructor function to create car objects
+function Car(make, model, year) {
+    this.make   = make;
+    this.model  = model;
+    this.year   = year;
+    this.sayCar = function() {
+        alert('I have a ' + this.year + ' ' 
+			  + this.make + ' ' 
+			  + this.model + '.');
+    };
+}
+
+
+
+
+
+
+// create 2 car objects for John and Jane
+var johnCar = new Car('Ford', 'F150', '2011'),
+    janeCar = new Car('Audi', 'A4', '2007');
+
+// call method on Jane's car
+janeCar.sayCar();
+				</code></pre>
+			</section>
+			<section class="description">
+			JavaScript’s Constructor Pattern solves the Factory Pattern’s type determination problem by replacing the factory function with a constructor function to create new objects. By convention, constructor functions always start with a capital letter, as opposed to the camelCase convention we see throughout JavaScript. This convention helps to distinguish constructor functions from other functions in JavaScript. Constructor functions must be preceded by the new keyword in JavaScript (this is what makes them a “constructor”). As stated above, the new keyword performs several actions when placed before a constructor function, shown in the example code above.
+
+The main problem with the Constructor Pattern is, as in the Factory Pattern, inefficiency. In the Constructor Pattern, methods are [still] copied to all new object instances. This problem led to the creation of the Combination Constructor/Prototype Pattern.
+			</section>
+		</article>
+
+				<article>
+			<header>Prototype</header>
+			<section class="code">
+				<pre><code>
+// constructor function to create car objects
+function Car() {}
+
+Car.prototype.make = 'no make';
+Car.prototype.model = 'no model';
+Car.prototype.year = '1990'
+Car.prototype.sayCar = function() {
+    alert('I have a ' + this.year + ' ' 
+		      + this.make + ' ' 
+		      + this.model + '.');
+};
+
+
+
+
+
+
+// create 2 car objects for John and Jane
+var johnCar = new Car(),
+    janeCar = new Car();
+
+// overriding defaults for johnCar
+janeCar.make = 'Ford';
+janeCar.model = 'F150';
+janeCar.year = '2011';
+
+// call method on Jane's car
+janeCar.sayCar();
+				</code></pre>
+			</section>
+			<section class="description">
+			Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatem animi eius, numquam voluptates voluptatibus enim quis qui! Culpa aspernatur quo magni impedit ex, a, itaque odio atque voluptatem! Recusandae, ipsam perferendis maiores iusto possimus voluptas sit praesentium a laboriosam ipsum in, eos mollitia totam aut deleniti doloribus officia odio sequi repellendus facilis doloremque, sint hic pariatur. Architecto corporis iusto nam sapiente placeat esse nulla itaque eaque excepturi, harum cumque. Veniam sequi doloribus nisi veritatis commodi mollitia praesentium omnis velit nobis cum, quibusdam beatae molestias, ullam nihil deserunt blanditiis, et. Sunt consequuntur veritatis atque illum maiores obcaecati accusantium expedita, voluptates nostrum!
+			</section>
+		</article>	
+
+		<article>
+			<header>Constructor/Prototype Combination</header>
+			<section>
+				<pre><code>
+// constructor function to create car objects
+function Car(make, model, year) {
+    this.make   = make;
+    this.model  = model;
+    this.year   = year;
+}
+
+// constructor prototype to share properties and methods
+Car.prototype.sayCar = function() {
+    alert('I have a ' + this.year + ' '
+		      + this.make + ' '
+		      + this.model + '.');
+};
+
+
+
+
+// create 2 car objects for John and Jane
+var johnCar = new Car('Ford', 'F150', '2011'),
+    janeCar = new Car('Audi', 'A4', '2007');
+
+// call method on Jane's car
+janeCar.sayCar();
+				</code></pre>
+			</section>
+			<section class="description">
+			JavaScript’s Combination Constructor/Prototype Pattern solves the efficiency issues present in the Factory Pattern and Constructor Pattern by utilizing prototypal inheritance — or prototypal delegation as explained above. It is among the most popular object oriented design patterns in JavaScript because it allows for unique (non-shared) instance properties to be created within a constructor function, as well as shared properties and methods on the constructor function’s prototype.
+
+One important thing to note about prototypes is that if you assign your constructor’s prototype to an object literal instead of using the dot notation, you will overwrite the default constructor property. The object literal tells JavaScript to replace the prototype with a new object, rather than augment the existing prototype. Because constructor is simply a default property on all prototypes, it gets removed when you replace the prototype with a new object. If you wish to assign a new object to a prototype and maintain the constructor relationship, you will need to recreate the constructor property and assign it the proper value
+			</section>
+		</article>
+		<article>
+			<header>Dynamic Prototype</header>
+			<section>
+				<pre><code>
+// constructor function to create car objects
+function Car(make, model, year) {
+    this.make   = make;
+    this.model  = model;
+    this.year   = year;
+
+    // constructor prototype to share properties and methods
+    if ( typeof this.sayCar !== "function" ) {
+        Car.prototype.sayCar = function() {
+            alert('I have a ' + this.year + ' '
+            		      + this.make + ' '
+            		      + this.model + '.');    
+        }        
+    }
+}
+
+
+// create 2 car objects for John and Jane
+var johnCar = new Car('Ford', 'F150', '2011'),
+    janeCar = new Car('Audi', 'A4', '2007');
+
+// call method on Jane's car
+janeCar.sayCar();
+				</code></pre>
+			</section>
+			<section class="description">
+			JavaScript’s Dynamic Prototype Pattern encapsulates all information within a constructor, and has the benefits of both unique instance properties and shared prototypal properties and methods. In the Dynamic Prototype Pattern, the prototype is initialized inside of a constructor function. Then, conditional logic is implemented to ensure the prototype is initialized only on the first object instance created by a constructor.
+
+In the example above, we check if the Car prototype has been initialized by comparing the type of the sayCar method to a function. When the johnCar instance is created, the if statement evaluates to true and the prototype method sayCar is initialized. When the janeCar instance is created, the if statement evaluates to false because the sayCar method was already initialized.
+			</section>
+		</article>
+
+				<article>
+			<header>OLOO</header>
+			<section>
+				<pre><code>
+// constructor object to create car objects
+var Car = {
+    init: function(make, model, year) {
+        this.make   = make;
+        this.model  = model;
+        this.year   = year;        
+    },
+    sayCar: function() {
+        alert('I have a ' + this.year + ' ' 
+        		      + this.make + ' ' 
+        		      + this.model + '.');    
+    }
+};
+
+
+// create 2 car objects for John and Jane
+var johnCar = Object.create(Car),
+    janeCar = Object.create(Car);
+
+// call init method on John and Jane
+johnCar.init('Ford', 'F150', '2011');
+janeCar.init('Audi', 'A4', '2007');
+
+// call method on Jane's car
+janeCar.sayCar();
+				</code></pre>
+			</section>
+			<section class="description">
+			In the example above, the johnCar and janeCar objects delegate to the Car object. It’s important to note that in OLOO there are no constructors. While the first letter of the Car object is still capitalized, it is done so only to remain consistent with the accepted convention.
+
+In OLOO, rather than the implicit initialization that occurs in constructor patterns, we have explicit initialization using a method (init in the example above). The result is that OLOO allows/forces you to create and initialize your objects at separate times, rather than bundling both object creation and initialization together.
+
+As far as efficiency through prototypal inheritance (or “delegation“) is concerned, while it may appear absent in the OLOO Pattern, prototypal inheritance is happening
+			</section>
+		</article>
+		<article></article>
+		<article></article>
+		<article></article>
+		<article></article>
+	</section>
+</main>
+
+</body>
+</html>
